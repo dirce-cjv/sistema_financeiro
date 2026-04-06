@@ -1,0 +1,26 @@
+# Ignorar ambientes virtuais
+.venv/
+venv/
+
+# Ignorar cache do Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignorar arquivos temporários
+*.log
+*.tmp
+
+# Ignorar configurações locais de IDEs
+.vscode/
+.idea/
+
+# Ignorar arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar arquivos sensíveis
+.env
+
+# Ignorar pasta de credenciais
+acesso_google/
