@@ -9,6 +9,7 @@ from models.expense import PendingSheetRow
 # Colunas: A=ID, B=Data, C=Descrição, D=Valor, E=Categoria (1-based)
 COL_ID = 1
 COL_DESCRIPTION = 3
+COL_VALUE = 4
 COL_CATEGORY = 5
 
 
@@ -86,3 +87,23 @@ class GoogleSheetsClient:
             for row, category in row_category_pairs
         ]
         self.worksheet.batch_update(batch_payload, value_input_option="USER_ENTERED")
+
+    def get_expense_rows_for_dashboard(self) -> list[dict[str, str]]:
+        """
+        Retorna linhas de dados da planilha no formato bruto para o dashboard.
+        Cada item contém `valor` e `categoria`.
+        """
+        all_values = self.worksheet.get_all_values()
+        if len(all_values) <= 1:
+            return []
+
+        rows: list[dict[str, str]] = []
+        for row in all_values[1:]:
+            padded = (row + [""] * COL_CATEGORY)[:COL_CATEGORY]
+            rows.append(
+                {
+                    "valor": str(padded[COL_VALUE - 1]).strip() if padded[COL_VALUE - 1] else "",
+                    "categoria": str(padded[COL_CATEGORY - 1]).strip() if padded[COL_CATEGORY - 1] else "",
+                }
+            )
+        return rows

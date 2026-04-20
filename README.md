@@ -149,6 +149,8 @@ O servidor fica em `http://localhost:3333` (ou na porta definida em `PORT`).
 | Método | Caminho | Descrição |
 |--------|---------|-----------|
 | GET | `/teste` | Verifica se o servidor está no ar |
+| GET | `/dashboard` | Página HTML do dashboard financeiro (gráfico de pizza) |
+| GET | `/dados_dashboard` | Dados agregados de despesas por categoria (JSON) |
 | POST | `/import/expenses` | Importa Excel (`multipart/form-data`, campo `file`) |
 | POST | `/categorizar` | Categoriza linhas sem categoria (corpo JSON vazio, `{}` ou `{"limit": n}`) |
 | POST | `/processar` | **Rota unificada**: ver abaixo |
@@ -168,6 +170,12 @@ Health check:
 
 ```bash
 curl http://localhost:3333/teste
+```
+
+Dados do dashboard (JSON):
+
+```bash
+curl http://localhost:3333/dados_dashboard
 ```
 
 Categorizar (corpo vazio ou `{}`):
@@ -199,6 +207,45 @@ Ou pela rota unificada:
 ```bash
 curl -X POST http://localhost:3333/processar -F "file=@C:\caminho\para\despesas.xlsx"
 ```
+
+## Dashboard Financeiro (MVP)
+
+Abra no navegador:
+
+- `http://localhost:3333/dashboard`
+
+Preview do dashboard (adicione sua imagem em `docs/dashboard-preview.png`):
+
+![Preview do Dashboard](docs/dashboard-preview.png)
+
+O dashboard usa:
+
+- **Chart.js** para renderizar o gráfico de pizza
+- `GET /dados_dashboard` para buscar os dados agregados
+- `backend/templates/dashboard.html` como página
+- `backend/static/js/script_dashboard.js` para buscar dados e montar o gráfico
+
+Formato retornado por `GET /dados_dashboard`:
+
+```json
+{
+  "despesas_por_categoria": {
+    "Alimentação": 1200.5,
+    "Transporte": 430.0,
+    "Moradia": 2500.0,
+    "Lazer": 320.75,
+    "Outros": 180.2
+  }
+}
+```
+
+Regras da agregação no backend:
+
+- Lê os dados da planilha Google Sheets
+- Considera apenas **despesas** (valores negativos)
+- Agrupa por categoria
+- Soma os valores por categoria (em módulo/valor absoluto para visualização)
+- Categorias não mapeadas ou vazias são consolidadas em `Outros`
 
 ## Frontend
 

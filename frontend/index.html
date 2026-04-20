@@ -35,9 +35,24 @@
           Categorizar linhas sem categoria
         </button>
         <div id="categorize-status" class="status"></div>
+
+        <hr class="divider" />
+
+        <h2 class="subtitle">Dashboard de Despesas por Categoria</h2>
+        <p class="hint">
+          O gráfico considera apenas despesas (valores negativos) vindas da planilha.
+        </p>
+        <button id="refresh-dashboard-button" type="button">
+          Atualizar gráfico
+        </button>
+        <div id="dashboard-status" class="status"></div>
+        <div class="chart-container">
+          <canvas id="graficoPizza"></canvas>
+        </div>
       </section>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>

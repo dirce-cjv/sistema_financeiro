@@ -13,6 +13,7 @@ from flask_cors import CORS
 
 from config import Config
 from routes.categorize_routes import categorize_blueprint
+from routes.dashboard_routes import dashboard_blueprint
 from routes.health_routes import health_blueprint
 from routes.import_routes import import_blueprint
 from routes.process_routes import process_blueprint
@@ -26,6 +27,7 @@ def create_app() -> Flask:
     CORS(app, resources={r"/*": {"origins": "*"}})
 
     app.register_blueprint(health_blueprint)
+    app.register_blueprint(dashboard_blueprint)
     app.register_blueprint(import_blueprint)
     app.register_blueprint(categorize_blueprint)
     app.register_blueprint(process_blueprint)

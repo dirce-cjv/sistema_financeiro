@@ -5,7 +5,12 @@ from typing import Any
 from agent.gemini_agent import GeminiAgent
 from agent.prompts.categorize_prompt import build_categorize_prompt
 from integrations.google_sheets import GoogleSheetsClient
-from utils.text import normalize_category_text
+from utils.text import (
+    canonicalize_category,
+    infer_category_by_keywords,
+    normalize_category_text,
+    normalize_description_for_ai,
+)
 
 
 def run_batch_categorization(options: dict[str, Any]) -> dict[str, Any]:
@@ -31,17 +36,22 @@ def run_batch_categorization(options: dict[str, Any]) -> dict[str, Any]:
 
     for item in pending:
         try:
-            text = (item.description or "").strip()
+            text = normalize_description_for_ai(item.description)
             if not text:
-                raw = ""
+                category = "Outros"
             else:
-                raw = agent.generate_text(build_categorize_prompt(text))
-            category = normalize_category_text(raw)
+                # 1) Regra local (rápida e barata). 2) IA apenas se necessário.
+                rule_based = infer_category_by_keywords(text)
+                if rule_based:
+                    category = rule_based
+                else:
+                    raw = agent.generate_text(build_categorize_prompt(text))
+                    category = canonicalize_category(normalize_category_text(raw))
         except Exception:
-            category = "não identificado"
+            category = "Outros"
 
         if not category or not str(category).strip():
-            category = "não identificado"
+            category = "Outros"
 
         updates.append((item.row, category))
         details.append(
